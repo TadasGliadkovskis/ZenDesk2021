@@ -18,12 +18,12 @@ def get_url():
       page_no = 1
       response = {}
 
-      response = requests.get('https://zcctadas.zendesk.com/api/v2/tickets/tickets.json',auth=HTTPBasicAuth('tadas2410@gmail.com','tRNhWPBeGc2hm7u!'))
+      response = requests.get('https://zcctadas.zendesk.com/api/v2/tickets.json',auth=HTTPBasicAuth('tadas2410@gmail.com','tRNhWPBeGc2hm7u!'))
       data = response.json()
       
-      if not check_errors(response):
-            t1 = Ticket(data['ticket'])
-            print(repr(t1))
+      if not check_errors(data):
+            for ticket in data['tickets']:
+                  print(repr(Ticket(ticket)))
 
 
 def check_errors(response):
@@ -62,4 +62,4 @@ class Ticket():
 
 
 if __name__ == "__main__":
-      get_one_ticket(1)
+      get_url()
