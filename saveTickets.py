@@ -43,8 +43,9 @@ class Ticket():
 
       def __repr__(self):
             status_letter = self.get_status_color()
+            empty_text = ""
             #O ID: 1 "Help with x" requested by 2131231 on
-            rep = "{} ID: {} '{}' requested by {} on {}".format(status_letter,self.id,self.subject,self.requester_id,self.created_at)
+            rep = "{0} ID: {1:<5} '{2:<50}' Requester {3:<5} on {4:<5}".format(status_letter,self.id,self.subject,self.requester_id,self.created_at,empty_text)
             return rep
       
       def get_status_color(self):
