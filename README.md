@@ -1,9 +1,9 @@
 # Zendesk Coding Challenge November 2021
 ## Key Features
-Use Zendesk API to fetch tickets
-Fetch tickets by ID
-Fetch all tickets and page through them
-Fetch tickets by ID and give detailed print out
+- Use Zendesk API to fetch tickets
+- Fetch tickets by ID
+- Fetch all tickets and page through them
+- Fetch tickets by ID and give detailed print out
 ## How to use
 To run this application you'll need [Python >= 3.9.6](https://www.python.org/downloads/) and [pip](https://pypi.org/) (which comes pre-installed with python)
 From your command line
