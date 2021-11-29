@@ -1,7 +1,6 @@
 from requests.models import HTTPBasicAuth
 from colorama import Fore, Style
 import requests
-import json
 import colorama
 import math
 import env
@@ -27,7 +26,7 @@ def get_tickets(page_no):
       response = requests.get(url , auth=HTTPBasicAuth(env.EMAIL,env.TOKEN))
       data = response.json() 
       if not check_errors(response.status_code):
-            print_tickets(data)
+            page_through_tickets(data,page_no)
 
 
 def check_errors(status_code):
@@ -54,11 +53,32 @@ def get_numeric_input():
                   print(Fore.RED + "Please Enter a Number: " + Style.RESET_ALL, end="")
                   user_input = input()
 
-
-def print_tickets(data):
+"""
+find out highest possible page choice
+then create array of possible page choices ranging from 1 until the last.
+Go through data creating ticket object and printing it.
+Tell the user what page they're on and ask for them to change pages.
+They can't request the page they're on or pages outside the available pages list
+"""
+def page_through_tickets(data, page_no):
+      last_page = math.ceil(data['count'] / env.TICKETS_PER_PAGE)
+      available_pages = []
+      for i in range(1, last_page + 1):
+            available_pages.append(i)
+      
       for ticket in data['tickets']:
             print(repr(Ticket(ticket)))
+      
+      print("\nCurrent Page {}/{}".format(page_no,last_page))
+      print_green("(0 to exit) Choose Page: ")
+      user_page_choice = get_numeric_input()
 
+      if user_page_choice == page_no:
+            print_red("Already on This Page: ") 
+      elif user_page_choice in available_pages:
+            get_tickets(user_page_choice)
+      else:
+            print_red("Invalid Page\n")
 
 def print_green(string):
       print(Fore.GREEN + string + Style.RESET_ALL, end="")
@@ -81,7 +101,8 @@ if __name__ == "__main__":
             user_option = get_numeric_input()
             if user_option in env.MENUOPTIONS:
                   if user_option == 1:
-                        print("Fetch All")
+                        print("")
+                        get_tickets(1)
                   elif user_option == 2:
                         print_green("Enter ID Number: ")
                         id = get_numeric_input()
