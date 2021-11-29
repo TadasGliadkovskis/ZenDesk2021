@@ -5,7 +5,6 @@ import colorama
 import math
 import env
 from Ticket import Ticket
-
 colorama.init()
 
 
@@ -94,30 +93,37 @@ def page_through_tickets(data, page_no):
             print_red("Invalid Page\n")
 
 
+def print_menu():
+      print("\n\t1. View All Tickets")
+      print("\t2. View Ticket By ID (Simple)")
+      print("\t3. View Ticket By ID (Description)")
+      print("\t4. Exit Ticket Viewer")
+      print_green("\nChoose an option: ")
+
+
 if __name__ == "__main__":
       
       PROGRAM_RUN = True
       print("\nWelcome To The Ticket Viewer")
       while PROGRAM_RUN:
             
-            print("\n\t1. View All Tickets")
-            print("\t2. View Ticket By ID (Simple)")
-            print("\t3. View Ticket By ID (Description)")
-            print("\t4. Exit Ticket Viewer")
-            print_green("\nChoose an option: ")
+            print_menu()#
             user_option = get_numeric_input()
             if user_option in env.MENUOPTIONS:
                   if user_option == 1:
                         print("")
                         get_tickets(1)
+
                   elif user_option == 2:
                         print_green("Enter ID Number: ")
                         id = get_numeric_input()
                         print(repr(get_ticket_by_id(id)))
+
                   elif user_option == 3:
                         print_green("Enter ID Number: ")
                         id = get_numeric_input()
                         get_ticket_by_id(id).detailed_print()
+
                   else:
                         print("Exiting ticket viewer")
                         PROGRAM_RUN = False
