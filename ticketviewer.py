@@ -8,25 +8,13 @@ from Ticket import Ticket
 
 colorama.init()
 
-"""
-Fetch Ticket from API using ID, turn into JSON
-Create Ticket Object and print out ticket
-"""
-def get_ticket_by_id(ticket_id):
-      url = 'https://{}.zendesk.com/api/v2/tickets/{}.json'.format(env.SUBDOMAIN, ticket_id)
-      response = requests.get(url, auth=HTTPBasicAuth(env.EMAIL, env.TOKEN))
-      data = response.json()
-      if not check_errors(response.status_code):
-            print('\n'+repr(Ticket(data['ticket'])))
+
+def print_green(string):
+      print(Fore.GREEN + string + Style.RESET_ALL, end="")
 
 
-def get_tickets(page_no):
-      response = {}
-      url = 'https://{}.zendesk.com/api/v2/tickets.json?page={}&per_page={}'.format(env.SUBDOMAIN, page_no,env.TICKETS_PER_PAGE)
-      response = requests.get(url , auth=HTTPBasicAuth(env.EMAIL,env.TOKEN))
-      data = response.json() 
-      if not check_errors(response.status_code):
-            page_through_tickets(data,page_no)
+def print_red(string):
+      print(Fore.RED + string + Style.RESET_ALL)
 
 
 def check_errors(status_code):
@@ -42,7 +30,31 @@ def check_errors(status_code):
       if status_code == 400:
             print_red("Invalid Ticked ID. Must be Number")
             return True
-            
+      if status_code[0] == 5:
+            print_red("Error with Server")
+            return True
+
+"""
+Fetch Ticket from API using ID, turn into JSON
+Create Ticket Object and return it
+The program chooses what way to print it in the main menu
+"""
+def get_ticket_by_id(ticket_id):
+      url = 'https://{}.zendesk.com/api/v2/tickets/{}.json'.format(env.SUBDOMAIN, ticket_id)
+      response = requests.get(url, auth=HTTPBasicAuth(env.EMAIL, env.TOKEN))
+      data = response.json()
+      if not check_errors(response.status_code):
+            return Ticket(data['ticket'])
+
+
+def get_tickets(page_no):
+      response = {}
+      url = 'https://{}.zendesk.com/api/v2/tickets.json?page={}&per_page={}'.format(env.SUBDOMAIN, page_no,env.TICKETS_PER_PAGE)
+      response = requests.get(url , auth=HTTPBasicAuth(env.EMAIL,env.TOKEN))
+      data = response.json() 
+      if not check_errors(response.status_code):
+            page_through_tickets(data,page_no)
+   
 
 def get_numeric_input():
       user_input = input()
@@ -52,6 +64,7 @@ def get_numeric_input():
             else:
                   print(Fore.RED + "Please Enter a Number: " + Style.RESET_ALL, end="")
                   user_input = input()
+
 
 """
 find out highest possible page choice
@@ -80,13 +93,6 @@ def page_through_tickets(data, page_no):
       else:
             print_red("Invalid Page\n")
 
-def print_green(string):
-      print(Fore.GREEN + string + Style.RESET_ALL, end="")
-
-
-def print_red(string):
-      print(Fore.RED + string + Style.RESET_ALL)
-
 
 if __name__ == "__main__":
       
@@ -95,8 +101,9 @@ if __name__ == "__main__":
       while PROGRAM_RUN:
             
             print("\n\t1. View All Tickets")
-            print("\t2. View Ticket By ID")
-            print("\t3. Exit Ticket Viewer")
+            print("\t2. View Ticket By ID (Simple)")
+            print("\t3. View Ticket By ID (Description)")
+            print("\t4. Exit Ticket Viewer")
             print_green("\nChoose an option: ")
             user_option = get_numeric_input()
             if user_option in env.MENUOPTIONS:
@@ -106,7 +113,11 @@ if __name__ == "__main__":
                   elif user_option == 2:
                         print_green("Enter ID Number: ")
                         id = get_numeric_input()
-                        get_ticket_by_id(id)
+                        print(repr(get_ticket_by_id(id)))
+                  elif user_option == 3:
+                        print_green("Enter ID Number: ")
+                        id = get_numeric_input()
+                        get_ticket_by_id(id).detailed_print()
                   else:
                         print("Exiting ticket viewer")
                         PROGRAM_RUN = False

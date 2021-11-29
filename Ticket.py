@@ -8,9 +8,11 @@ class Ticket():
             self.status = ticket['status']
             self.id = ticket['id']
             self.subject = ticket['subject']
+            self.priority = ticket['priority']
             self.description = ticket['description']
             self.requester_id = ticket['requester_id']
             self.created_at = self.extract_time(ticket['created_at'])
+            self.updated_at = self.extract_time(ticket['updated_at'])
 
       """
       Displays ticket in this format
@@ -22,6 +24,17 @@ class Ticket():
             ticket_string = "{0} ID: {1:<5} '{2:<50}' Requester {3:<5} on {4:<5}".format(status_letter,self.id,self.subject,self.requester_id,self.created_at)
             return ticket_string
       
+
+      def detailed_print(self):
+            print("\nStatus:    " + self.status)
+            print("ID:        {}".format(self.id))
+            print("Subject:   " + self.subject)
+            print("Priority:  " + self.priority)
+            print("Requester: {}".format(self.requester_id))
+            print("Created:   " + self.created_at)
+            print("Updated:   " + self.updated_at)
+            print("\n"+self.description)
+
       """
       Transforms string into datetime object 
       which allows for prettier formatting
