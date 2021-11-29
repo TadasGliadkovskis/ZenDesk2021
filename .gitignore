@@ -1,3 +1,4 @@
 info.txt
 *.pdf
 print.py
+__pycache__

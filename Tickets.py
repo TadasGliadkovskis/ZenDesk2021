@@ -4,32 +4,37 @@ import json
 import colorama
 from colorama import Fore, Style
 from datetime import datetime
+import env
 colorama.init()
 
 
 #curl https://zcctadas.zendesk.com/api/v2/tickets.json -v -u tadas2410@gmail.com:tRNhWPBeGc2hm7u! get JSON TICKETS
-def get_one_ticket(ticket_id):
-      response = requests.get('https://zcctadas.zendesk.com/api/v2/tickets/{}.json'.format(ticket_id),auth=HTTPBasicAuth('tadas2410@gmail.com','tRNhWPBeGc2hm7u!'))
+def get_ticket_by_id(ticket_id):
+      response = requests.get('https://{}.zendesk.com/api/v2/tickets/{}.json'.format(env.SUBDOMAIN, ticket_id),auth=HTTPBasicAuth(env.EMAIL,env.TOKEN))
       data = response.json()
-      print(response)
       if not check_errors(data):
             print(repr(Ticket(data['ticket'])))
 
 
-def get_url(page_no):
+def get_tickets(page_no):
       response = {}
-      response = requests.get('https://zcctadas.zendesk.com/api/v2/tickets.json?page={}&per_page=25'.format(page_no),auth=HTTPBasicAuth('tadas2410@gmail.com','tRNhWPBeGc2hm7u!'))
-      data = response.json()
+      response = requests.get('https://{}.zendesk.com/api/v2/tickets.json?page={}&per_page=25'.format(env.SUBDOMAIN, page_no),auth=HTTPBasicAuth(env.EMAIL,env.TOKEN))
+      data = response.json() 
       if not check_errors(data):
-            for ticket in data['tickets']:
-                 print(repr(Ticket(ticket)))
+            print_tickets(data)
+
+
+def print_tickets(data):
+      for ticket in data['tickets']:
+            print(repr(Ticket(ticket)))
 
 
 def check_errors(response):
       if 'error' in response:
-            print(response['error'])
+            print(Fore.RED + response['error'] + Style.RESET_ALL)
             return True #error does exist
             
+
 class Ticket():
       def __init__(self,ticket):
             self.status = ticket['status']
@@ -77,4 +82,4 @@ class Ticket():
 
 
 if __name__ == "__main__":
-      get_url(1)
+      get_ticket_by_id(0)
