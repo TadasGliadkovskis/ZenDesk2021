@@ -1,26 +1,31 @@
-import requests
 from requests.models import HTTPBasicAuth
-import json
-import colorama
 from colorama import Fore, Style
 from datetime import datetime
+import requests
+import json
+import colorama
+import math
 import env
 colorama.init()
 
-
-#curl https://zcctadas.zendesk.com/api/v2/tickets.json -v -u tadas2410@gmail.com:tRNhWPBeGc2hm7u! get JSON TICKETS
+"""
+Fetch Ticket from API using ID, turn into JSON
+Create Ticket Object and print out ticket
+"""
 def get_ticket_by_id(ticket_id):
-      response = requests.get('https://{}.zendesk.com/api/v2/tickets/{}.json'.format(env.SUBDOMAIN, ticket_id),auth=HTTPBasicAuth(env.EMAIL,env.TOKEN))
+      url = 'https://{}.zendesk.com/api/v2/tickets/{}.json'.format(env.SUBDOMAIN, ticket_id)
+      response = requests.get(url, auth=HTTPBasicAuth(env.EMAIL, env.TOKEN))
       data = response.json()
-      if not check_errors(data):
+      if not check_errors(response.status_code):
             print(repr(Ticket(data['ticket'])))
 
 
 def get_tickets(page_no):
       response = {}
-      response = requests.get('https://{}.zendesk.com/api/v2/tickets.json?page={}&per_page=25'.format(env.SUBDOMAIN, page_no),auth=HTTPBasicAuth(env.EMAIL,env.TOKEN))
+      url = 'https://{}.zendesk.com/api/v2/tickets.json?page={}&per_page={}'.format(env.SUBDOMAIN, page_no,env.TICKETS_PER_PAGE)
+      response = requests.get(url , auth=HTTPBasicAuth(env.EMAIL,env.TOKEN))
       data = response.json() 
-      if not check_errors(data):
+      if not check_errors(response.status_code):
             print_tickets(data)
 
 
@@ -29,10 +34,18 @@ def print_tickets(data):
             print(repr(Ticket(ticket)))
 
 
-def check_errors(response):
-      if 'error' in response:
-            print(Fore.RED + response['error'] + Style.RESET_ALL)
-            return True #error does exist
+def check_errors(status_code):
+      if status_code == 200:
+            return False
+      if status_code == 404:
+            print(Fore.RED + "No Ticket with such ID" + Style.RESET_ALL)
+            return True
+      if status_code == 401:
+            print (Fore.RED + "Couldn't Authenticate You" + Style.RESET_ALL)
+            return True
+      if status_code == 400:
+            print(Fore.RED + "Invalid Ticked ID. Must be Number" + Style.RESET_ALL)
+            return True
             
 
 class Ticket():
@@ -51,8 +64,8 @@ class Ticket():
       """
       def __repr__(self):
             status_letter = self.get_status_color()
-            rep = "{0} ID: {1:<5} '{2:<50}' Requester {3:<5} on {4:<5}".format(status_letter,self.id,self.subject,self.requester_id,self.created_at)
-            return rep
+            ticket_string = "{0} ID: {1:<5} '{2:<50}' Requester {3:<5} on {4:<5}".format(status_letter,self.id,self.subject,self.requester_id,self.created_at)
+            return ticket_string
       
       """
       Transforms string into datetime object 
@@ -79,7 +92,35 @@ class Ticket():
                   return Fore.YELLOW + status_letter + Style.RESET_ALL
             
 
+def get_numeric_input():
+      user_input = input()
+      if user_input.isnumeric():
+            return int(user_input)
+      else:
+            return user_input
 
 
 if __name__ == "__main__":
-      get_ticket_by_id(0)
+      MenuOptions = [1,2,3]
+      PROGRAM_RUN = False
+      print("\nWelcome To The Ticket Viewer")
+      while PROGRAM_RUN:
+            
+            print("\n\t1. View All Tickets")
+            print("\t2. View Ticket By ID")
+            print("\t3. Exit Ticket Viewer")
+            print(Fore.GREEN + "Choose an option:" + Style.RESET_ALL, end=" ")
+            user_option = get_numeric_input()
+            if user_option in MenuOptions:
+                  print("Valid")
+                  if user_option == 1:
+                        print("Fetch All")
+                  elif user_option == 2:
+                        id = input("Enter ID number: ")
+                        get_ticket_by_id(id)
+                  else:
+                        print("Exiting ticket viewer")
+                        break
+            else:
+                  print(Fore.RED + "Invalid option" + Style.RESET_ALL)
+            print(user_option)

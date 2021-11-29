@@ -2,3 +2,4 @@ info.txt
 *.pdf
 print.py
 __pycache__
+env
