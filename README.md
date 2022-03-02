@@ -24,6 +24,9 @@ env\Scripts\activate
 # Install Dependencies
 pip install -r requirements.txt
 
+# Environment variables
+Change credentials in env.py as outdated credentials
+
 # Run the app
 py ticketviewer.py
 
